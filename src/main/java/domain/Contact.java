@@ -1,11 +1,12 @@
 package domain;
 
+import domain.entities.contact.ContactType;
 import domain.entities.contact.Detail;
 import domain.entities.contact.Type;
 
 public class Contact {
 
-    private String type;
+    private ContactType type;
     private String detail;
 
     public static Contact create(Type type, Detail detail) {
@@ -20,11 +21,11 @@ public class Contact {
         this.detail = detail.getValue();
     }
 
-    public String getType() {
+    public ContactType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ContactType type) {
         this.type = type;
     }
 

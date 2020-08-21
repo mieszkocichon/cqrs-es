@@ -7,6 +7,7 @@ import domain.Contact;
 import domain.entities.address.City;
 import domain.entities.address.PostCode;
 import domain.entities.address.State;
+import domain.entities.contact.ContactType;
 import domain.entities.contact.Detail;
 import domain.entities.contact.Type;
 import escqrs.aggregates.CatAggregate;
@@ -70,10 +71,10 @@ public class ApplicationUnitTest {
                         .collect(Collectors.toSet()),
 
                 Stream.of(
-                        Contact.create(Type.type("EMAIL"),
+                        Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("john.smith@o2.com")),
 
-                        Contact.create(Type.type("EMAIL"),
+                        Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("john.smith@jiu.com")))
 
                         .collect(Collectors.toSet())
@@ -96,9 +97,9 @@ public class ApplicationUnitTest {
                 ).collect(Collectors.toSet()),
 
                 Stream.of(
-                        Contact.create(Type.type("EMAIL"),
+                        Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("john.smith@o2.com")),
-                        Contact.create(Type.type("EMAIL"),
+                        Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("john.smith@out.com"))
                 ).collect(Collectors.toSet())
         );

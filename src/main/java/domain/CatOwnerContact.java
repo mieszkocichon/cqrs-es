@@ -1,29 +1,31 @@
 package domain;
 
-import java.util.HashMap;
+import domain.entities.contact.ContactType;
+
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 
 public class CatOwnerContact {
 
-    private Map<String, Set<Contact>> contactByType;
+    private EnumMap<ContactType, Set<Contact>> contactByType;
 
     private CatOwnerContact() {
     }
 
     public static CatOwnerContact create() {
-        return new CatOwnerContact(new HashMap<>());
+        return new CatOwnerContact(new EnumMap<ContactType, Set<Contact>>(ContactType.class));
     }
 
-    private CatOwnerContact(Map<String, Set<Contact>> contactByType) {
+    private CatOwnerContact(EnumMap<ContactType, Set<Contact>> contactByType) {
         this.contactByType = contactByType;
     }
 
-    public Map<String, Set<Contact>> getContactByType() {
+    public Map<ContactType, Set<Contact>> getContactByType() {
         return contactByType;
     }
 
-    public void setContactByType(Map<String, Set<Contact>> contactByType) {
+    public void setContactByType(EnumMap<ContactType, Set<Contact>> contactByType) {
         this.contactByType = contactByType;
     }
 }

@@ -4,6 +4,7 @@ import domain.*;
 import cqrs.queries.AddressByRegionQuery;
 import cqrs.queries.ContactByTypeQuery;
 import cqrs.repository.CatReadRepository;
+import domain.entities.contact.ContactType;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ public class CatProjection {
         CatOwnerContact catOwnerContact = Optional.ofNullable(
                 this.catReadRepository.getCatContact(cat.getCatId())
         ).orElse(CatOwnerContact.create());
-        Map<String, Set<Contact>> contactByType = new HashMap<>();
+        EnumMap<ContactType, Set<Contact>> contactByType = new EnumMap<ContactType, Set<Contact>>(ContactType.class);
         for (Contact contact : cat.getContacts()) {
             Set<Contact> contacts = Optional.ofNullable(contactByType.get(contact.getType()))
                     .orElse(new HashSet<>());

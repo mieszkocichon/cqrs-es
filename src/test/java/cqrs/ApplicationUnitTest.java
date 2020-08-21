@@ -7,6 +7,7 @@ import cqrs.queries.AddressByRegionQuery;
 import domain.entities.address.City;
 import domain.entities.address.PostCode;
 import domain.entities.address.State;
+import domain.entities.contact.ContactType;
 import domain.entities.contact.Detail;
 import domain.entities.contact.Type;
 import org.junit.Before;
@@ -54,20 +55,20 @@ public class ApplicationUnitTest {
                                 PostCode.postCode("90001"))
                 ).collect(Collectors.toSet()),
 
-                Stream.of(Contact.create(Type.type("EMAIL"), Detail.detail("john.smith@o2.com")),
-                        Contact.create(Type.type("EMAIL"), Detail.detail("john.smith@jiu.com")))
+                Stream.of(Contact.create(Type.type(ContactType.EMAIL), Detail.detail("john.smith@jiu.com")),
+                        Contact.create(Type.type(ContactType.EMAIL), Detail.detail("john.smith@o2.com")))
                         .collect(Collectors.toSet()));
         cat = catAggregate.handleUpdateCatCommand(updateCatCommand);
         catProjection.project(cat);
 
-        ContactByTypeQuery contactByTypeQuery = ContactByTypeQuery.create(catId, "EMAIL");
+        ContactByTypeQuery contactByTypeQuery = ContactByTypeQuery.create(catId, ContactType.EMAIL);
 
         Iterator<Contact> contactIterator = catProjection.handle(contactByTypeQuery).iterator();
         Contact contact1 = contactIterator.next();
-        assertEquals(contact1.getType(), "EMAIL");
+        assertEquals(contact1.getType(), ContactType.EMAIL);
         assertEquals(contact1.getDetail(), "john.smith@o2.com");
         Contact contact2 = contactIterator.next();
-        assertEquals(contact2.getType(), "EMAIL");
+        assertEquals(contact2.getType(), ContactType.EMAIL);
         assertEquals(contact2.getDetail(), "john.smith@jiu.com");
 
         AddressByRegionQuery addressByRegionQuery = AddressByRegionQuery.create(catId, "NY");

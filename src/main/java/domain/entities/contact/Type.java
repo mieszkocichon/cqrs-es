@@ -1,20 +1,17 @@
 package domain.entities.contact;
 
 public class Type {
-    private final String value;
+    private final ContactType value;
 
-    public static Type type(String value) {
-        if (value.length() == 0) {
-            throw new IllegalArgumentException("Contact type is empty.");
-        }
+    public static Type type(ContactType value) {
         return new Type(value);
     }
 
-    private Type(String value) {
+    private Type(ContactType value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public ContactType getValue() {
         return value;
     }
 }

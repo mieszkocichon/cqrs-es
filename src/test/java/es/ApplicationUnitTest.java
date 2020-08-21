@@ -5,6 +5,7 @@ import domain.Contact;
 import domain.entities.address.City;
 import domain.entities.address.PostCode;
 import domain.entities.address.State;
+import domain.entities.contact.ContactType;
 import domain.entities.contact.Detail;
 import domain.entities.contact.Type;
 import es.reporitory.EventStore;
@@ -36,9 +37,9 @@ public class ApplicationUnitTest {
 
         this.catService.createCat(catId, "Kitek");
         this.catService.updateCat(catId,
-                Stream.of(Contact.create(Type.type("Email"),
+                Stream.of(Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("john.smith@o2.com")),
-                        Contact.create(Type.type("Email"),
+                        Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("joh.smith@ijk.com")))
                         .collect(Collectors.toSet()),
                 Stream.of(Address.create(City.city("New York"),
@@ -49,9 +50,9 @@ public class ApplicationUnitTest {
                                 PostCode.postCode("90001"))).collect(Collectors.toSet())
                 );
         this.catService.updateCat(catId,
-                Stream.of(Contact.create(Type.type("Email"),
+                Stream.of(Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("john.smith@o2.com")),
-                        Contact.create(Type.type("Email"),
+                        Contact.create(Type.type(ContactType.EMAIL),
                                 Detail.detail("joh.smith@ijk.com")))
                         .collect(Collectors.toSet()),
                 Stream.of(Address.create(City.city("Krakow"),

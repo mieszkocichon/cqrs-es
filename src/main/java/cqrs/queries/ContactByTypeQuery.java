@@ -1,18 +1,20 @@
 package cqrs.queries;
 
+import domain.entities.contact.ContactType;
+
 public class ContactByTypeQuery {
 
     private String catId;
-    private String contactType;
+    private ContactType contactType;
 
-    public static ContactByTypeQuery create(String catId, String contactType) {
+    public static ContactByTypeQuery create(String catId, ContactType contactType) {
         return new ContactByTypeQuery(catId, contactType);
     }
 
     private ContactByTypeQuery() {
     }
 
-    private ContactByTypeQuery(String catId, String contactType) {
+    private ContactByTypeQuery(String catId, ContactType contactType) {
         this.catId = catId;
         this.contactType = contactType;
     }
@@ -25,11 +27,11 @@ public class ContactByTypeQuery {
         this.catId = catId;
     }
 
-    public String getContactType() {
+    public ContactType getContactType() {
         return contactType;
     }
 
-    public void setContactType(String contactType) {
+    public void setContactType(ContactType contactType) {
         this.contactType = contactType;
     }
 }
