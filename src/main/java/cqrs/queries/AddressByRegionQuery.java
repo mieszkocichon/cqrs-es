@@ -5,10 +5,14 @@ public class AddressByRegionQuery {
     private String catId;
     private String state;
 
+    public static AddressByRegionQuery create(String catId, String state) {
+        return new AddressByRegionQuery(catId, state);
+    }
+
     private AddressByRegionQuery() {
     }
 
-    public AddressByRegionQuery(String catId, String state) {
+    private AddressByRegionQuery(String catId, String state) {
         this.catId = catId;
         this.state = state;
     }

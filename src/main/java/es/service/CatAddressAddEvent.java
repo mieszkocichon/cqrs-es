@@ -8,7 +8,11 @@ public class CatAddressAddEvent extends Event {
     private String state;
     private String postcode;
 
-    public CatAddressAddEvent(String city, String state, String postcode) {
+    public static CatAddressAddEvent create(String city, String state, String postcode) {
+        return new CatAddressAddEvent(city, state, postcode);
+    }
+
+    private CatAddressAddEvent(String city, String state, String postcode) {
         this.city = city;
         this.state = state;
         this.postcode = postcode;

@@ -11,7 +11,11 @@ public class EventStore extends Event {
 
     private Map<String, List<Event>> store;
 
-    public EventStore() {
+    public static EventStore empty() {
+        return new EventStore();
+    }
+
+    private EventStore() {
         this.store = new HashMap<>();
     }
 

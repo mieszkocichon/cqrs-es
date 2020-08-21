@@ -2,7 +2,6 @@ package es.service;
 
 import domain.Address;
 import domain.Cat;
-import domain.CatAddress;
 import domain.Contact;
 import es.events.CatAddressRemoveEvent;
 import es.events.CatCreatedEvent;
@@ -13,17 +12,21 @@ import java.util.stream.Collectors;
 
 public class CatService {
 
-    EventStore repository;
+    private EventStore repository;
+
+    public static CatService create(EventStore repository) {
+        return new CatService(repository);
+    }
 
     private CatService() {
     }
 
-    public CatService(EventStore repository) {
+    private CatService(EventStore repository) {
         this.repository = repository;
     }
 
     public void createCat(String catId, String name) {
-        this.repository.addEvent(catId, new CatCreatedEvent(catId, name));
+        this.repository.addEvent(catId, CatCreatedEvent.create(catId, name));
     }
 
     public void updateCat(String catId, Set<Contact> contacts, Set<Address> addresses) throws Exception {
@@ -36,11 +39,11 @@ public class CatService {
         cat.getAddresses()
                 .stream()
                 .filter(addresses::contains)
-                .forEach(a -> this.repository.addEvent(catId, new CatAddressRemoveEvent(a.getCity(), a.getState(), a.getPostcode())));
+                .forEach(a -> this.repository.addEvent(catId, CatAddressRemoveEvent.create(a.getCity(), a.getState(), a.getPostcode())));
 
         addresses.stream()
                 .filter(a -> !cat.getAddresses().contains(a))
-                .forEach(a -> repository.addEvent(catId, new CatAddressAddEvent(a.getCity(), a.getState(), a.getPostcode())));
+                .forEach(a -> repository.addEvent(catId, CatAddressAddEvent.create(a.getCity(), a.getState(), a.getPostcode())));
     }
 
     public Set<Address> getAddressByRegion(String catId, String state) throws Exception {

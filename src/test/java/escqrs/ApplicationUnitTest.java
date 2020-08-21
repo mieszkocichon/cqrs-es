@@ -1,10 +1,14 @@
 package escqrs;
 
-
 import cqrs.commands.UpdateCatCommand;
 import cqrs.queries.AddressByRegionQuery;
 import domain.Address;
 import domain.Contact;
+import domain.entities.address.City;
+import domain.entities.address.PostCode;
+import domain.entities.address.State;
+import domain.entities.contact.Detail;
+import domain.entities.contact.Type;
 import escqrs.aggregates.CatAggregate;
 import cqrs.commands.CreateCatCommand;
 import cqrs.projections.CatProjection;
@@ -34,11 +38,11 @@ public class ApplicationUnitTest {
 
     @Before
     public void setUp() {
-        this.writeRepository = new EventStore();
-        this.catReadRepository = new CatReadRepository();
-        this.catProjector = new CatProjector(this.catReadRepository);
-        this.catAggregate = new CatAggregate(this.writeRepository);
-        this.catProjection = new CatProjection(this.catReadRepository);
+        this.writeRepository = EventStore.empty();
+        this.catReadRepository = CatReadRepository.empty();
+        this.catProjector = CatProjector.create(this.catReadRepository);
+        this.catAggregate = CatAggregate.create(this.writeRepository);
+        this.catProjection = CatProjection.create(this.catReadRepository);
     }
 
     @Test
@@ -46,36 +50,56 @@ public class ApplicationUnitTest {
         String catId = UUID.randomUUID().toString();
 
         List<Event> events = null;
-        CreateCatCommand createCatCommand = new CreateCatCommand(catId, "Kitek");
+        CreateCatCommand createCatCommand = CreateCatCommand.create(catId, "Kitek");
         events = this.catAggregate.handleCreateCatCommand(createCatCommand);
 
         catProjector.project(catId, events);
 
-        UpdateCatCommand updateCatCommand = new UpdateCatCommand(
+        UpdateCatCommand updateCatCommand = UpdateCatCommand.create(
                 catId,
 
                 Stream.of(
-                        new Address("New York", "NY", "10001"),
-                        new Address("Los Angeles", "CA", "90001")).collect(Collectors.toSet()),
+                        Address.create(City.city("New York"),
+                                State.state("NY"),
+                                PostCode.postCode("10001")),
+
+                        Address.create(City.city("Los Angeles"),
+                                State.state("CA"),
+                                PostCode.postCode("90001")))
+
+                        .collect(Collectors.toSet()),
 
                 Stream.of(
-                        new Contact("EMAIL", "john.smith@o2.com"),
-                        new Contact("EMAIL", "john.smith@jiu.com")).collect(Collectors.toSet())
+                        Contact.create(Type.type("EMAIL"),
+                                Detail.detail("john.smith@o2.com")),
+
+                        Contact.create(Type.type("EMAIL"),
+                                Detail.detail("john.smith@jiu.com")))
+
+                        .collect(Collectors.toSet())
         );
         events = catAggregate.handleUpdateCatCommand(updateCatCommand);
         catProjector.project(catId, events);
 
-        updateCatCommand = new UpdateCatCommand(
+        updateCatCommand = UpdateCatCommand.create(
                 catId,
 
                 Stream.of(
-                        new Address("New York2", "NY", "10002"),
-                        new Address("Las Vegas", "LV", "30001")
+                        Address.create(City.city("New York2"),
+                                State.state("NY"),
+                                PostCode.postCode("10002")),
+
+                        Address.create(City.city("Las Vegas"),
+                                State.state("LV"),
+                                PostCode.postCode("30001"))
+
                 ).collect(Collectors.toSet()),
 
                 Stream.of(
-                        new Contact("EMAIL", "john.smith@o2.com"),
-                        new Contact("EMAIL", "john.smith@out.com")
+                        Contact.create(Type.type("EMAIL"),
+                                Detail.detail("john.smith@o2.com")),
+                        Contact.create(Type.type("EMAIL"),
+                                Detail.detail("john.smith@out.com"))
                 ).collect(Collectors.toSet())
         );
         events = catAggregate.handleUpdateCatCommand(updateCatCommand);
@@ -83,7 +107,7 @@ public class ApplicationUnitTest {
 
 //        ContactByTypeQuery contactByTypeQuery = new ContactByTypeQuery(catId, "EMAIL");
 
-        AddressByRegionQuery addressByRegionQuery = new AddressByRegionQuery(catId, "LV");
+        AddressByRegionQuery addressByRegionQuery = AddressByRegionQuery.create(catId, "LV");
         Iterator<Address> addressIterator = catProjection.handle(addressByRegionQuery).iterator();
         Address address = addressIterator.next();
         assertNotEquals(address.getCity(), "New York");

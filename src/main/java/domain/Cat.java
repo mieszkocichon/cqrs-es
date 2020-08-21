@@ -9,10 +9,14 @@ public class Cat {
     private Set<Contact> contacts;
     private Set<Address> addresses;
 
+    public static Cat create(String catId, String name) {
+        return new Cat(catId, name);
+    }
+
     private Cat() {
     }
 
-    public Cat(String catId, String name) {
+    private Cat(String catId, String name) {
         this.catId = catId;
         this.name = name;
         this.contacts = new HashSet<>();

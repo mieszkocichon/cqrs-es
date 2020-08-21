@@ -1,16 +1,23 @@
 package domain;
 
+import domain.entities.contact.Detail;
+import domain.entities.contact.Type;
+
 public class Contact {
 
     private String type;
     private String detail;
 
+    public static Contact create(Type type, Detail detail) {
+        return new Contact(type, detail);
+    }
+
     private Contact() {
     }
 
-    public Contact(String type, String detail) {
-        this.type = type;
-        this.detail = detail;
+    private Contact(Type type, Detail detail) {
+        this.type = type.getValue();
+        this.detail = detail.getValue();
     }
 
     public String getType() {

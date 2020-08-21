@@ -8,6 +8,9 @@ public abstract class Event {
 
     public final Date created = new Date();
 
+    public Event() {
+    }
+
     @Override
     public String toString() {
         return "Event{" +

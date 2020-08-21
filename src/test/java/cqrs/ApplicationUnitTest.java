@@ -4,6 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import cqrs.queries.AddressByRegionQuery;
+import domain.entities.address.City;
+import domain.entities.address.PostCode;
+import domain.entities.address.State;
+import domain.entities.contact.Detail;
+import domain.entities.contact.Type;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,37 +34,43 @@ public class ApplicationUnitTest {
 
     @Before
     public void SetUp() {
-        this.catAggregate = new CatAggregate();
-        this.catProjection = new CatProjection();
+        this.catAggregate = CatAggregate.empty();
+        this.catProjection = CatProjection.empty();
     }
 
     @Test
     public void givenCQRSApplication_whenCommandRun_thenQueryShouldReturnResult() throws Exception {
         String catId = UUID.randomUUID().toString();
-        CreateCatCommand createCatCommand = new CreateCatCommand(catId, "kitus");
+        CreateCatCommand createCatCommand = CreateCatCommand.create(catId, "kitus");
         Cat cat = catAggregate.handleCreateCatCommand(createCatCommand);
         catProjection.project(cat);
 
-        UpdateCatCommand updateCatCommand = new UpdateCatCommand(cat.getCatId(),
-                Stream.of(new Address("New York", "NY", "10001"),
-                        new Address("Los Angeles", "CA", "90001")).collect(Collectors.toSet()),
-                Stream.of(new Contact("EMAIL", "john.smith@o2.com"),
-                        new Contact("EMAIL", "john.smith@jiu.com"))
+        UpdateCatCommand updateCatCommand = UpdateCatCommand.create(cat.getCatId(),
+                Stream.of(Address.create(City.city("New York"),
+                                State.state("NY"),
+                                PostCode.postCode("10001")),
+                        Address.create(City.city("Los Angeles"),
+                                State.state("CA"),
+                                PostCode.postCode("90001"))
+                ).collect(Collectors.toSet()),
+
+                Stream.of(Contact.create(Type.type("EMAIL"), Detail.detail("john.smith@o2.com")),
+                        Contact.create(Type.type("EMAIL"), Detail.detail("john.smith@jiu.com")))
                         .collect(Collectors.toSet()));
         cat = catAggregate.handleUpdateCatCommand(updateCatCommand);
         catProjection.project(cat);
 
-        ContactByTypeQuery contactByTypeQuery = new ContactByTypeQuery(catId, "EMAIL");
+        ContactByTypeQuery contactByTypeQuery = ContactByTypeQuery.create(catId, "EMAIL");
 
         Iterator<Contact> contactIterator = catProjection.handle(contactByTypeQuery).iterator();
         Contact contact1 = contactIterator.next();
         assertEquals(contact1.getType(), "EMAIL");
-        assertEquals(contact1.getDetail(), "john.smith@jiu.com");
+        assertEquals(contact1.getDetail(), "john.smith@o2.com");
         Contact contact2 = contactIterator.next();
         assertEquals(contact2.getType(), "EMAIL");
-        assertEquals(contact2.getDetail(), "john.smith@o2.com");
+        assertEquals(contact2.getDetail(), "john.smith@jiu.com");
 
-        AddressByRegionQuery addressByRegionQuery = new AddressByRegionQuery(catId, "NY");
+        AddressByRegionQuery addressByRegionQuery = AddressByRegionQuery.create(catId, "NY");
         Set<Address> addressesSet = catProjection.handle(addressByRegionQuery);
         Iterator<Address> addressIterator = addressesSet.iterator();
 

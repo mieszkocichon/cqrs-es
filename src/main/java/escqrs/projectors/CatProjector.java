@@ -3,7 +3,9 @@ package escqrs.projectors;
 import cqrs.repository.CatReadRepository;
 import domain.Address;
 import domain.CatAddress;
-import es.events.CatUpdateCatCommand;
+import domain.entities.address.City;
+import domain.entities.address.PostCode;
+import domain.entities.address.State;
 import es.reporitory.Event;
 import es.service.CatAddressAddEvent;
 
@@ -14,13 +16,21 @@ import java.util.Set;
 
 public class CatProjector {
 
-    CatReadRepository catReadRepository;
+    private CatReadRepository catReadRepository;
 
-    public CatProjector() {
-        this.catReadRepository = new CatReadRepository();
+    public static CatProjector empty() {
+        return new CatProjector();
     }
 
-    public CatProjector(CatReadRepository catReadRepository) {
+    public static CatProjector create(CatReadRepository catReadRepository) {
+        return new CatProjector(catReadRepository);
+    }
+
+    private CatProjector() {
+        this.catReadRepository = CatReadRepository.empty();
+    }
+
+    private CatProjector(CatReadRepository catReadRepository) {
         this.catReadRepository = catReadRepository;
     }
 
@@ -33,13 +43,13 @@ public class CatProjector {
     }
 
     public void apply(String catId, CatAddressAddEvent catAddressAddEvent) {
-        Address address = new Address(
-                catAddressAddEvent.getCity(),
-                catAddressAddEvent.getState(),
-                catAddressAddEvent.getPostcode());
+        Address address = Address.create(
+                City.city(catAddressAddEvent.getCity()),
+                State.state(catAddressAddEvent.getState()),
+                PostCode.postCode(catAddressAddEvent.getPostcode()));
 
         CatAddress catAddress = Optional.ofNullable(catReadRepository.getCatAddress(catId))
-                .orElse(new CatAddress());
+                .orElse(CatAddress.create());
 
         Set<Address> addresses = Optional.ofNullable(catAddress.getAddressByType()
             .get(address.getState())).orElse(new HashSet<>());

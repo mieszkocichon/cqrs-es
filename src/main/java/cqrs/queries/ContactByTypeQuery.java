@@ -5,10 +5,14 @@ public class ContactByTypeQuery {
     private String catId;
     private String contactType;
 
+    public static ContactByTypeQuery create(String catId, String contactType) {
+        return new ContactByTypeQuery(catId, contactType);
+    }
+
     private ContactByTypeQuery() {
     }
 
-    public ContactByTypeQuery(String catId, String contactType) {
+    private ContactByTypeQuery(String catId, String contactType) {
         this.catId = catId;
         this.contactType = contactType;
     }

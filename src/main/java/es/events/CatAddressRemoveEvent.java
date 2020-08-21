@@ -8,10 +8,14 @@ public class CatAddressRemoveEvent extends Event {
     private String state;
     private String postcode;
 
+    public static CatAddressRemoveEvent create(String city, String state, String postcode) {
+        return new CatAddressRemoveEvent(city, state, postcode);
+    }
+
     private CatAddressRemoveEvent() {
     }
 
-    public CatAddressRemoveEvent(String city, String state, String postcode) {
+    private CatAddressRemoveEvent(String city, String state, String postcode) {
         super();
 
         this.city = city;

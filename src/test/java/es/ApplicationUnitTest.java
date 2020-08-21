@@ -2,6 +2,11 @@ package es;
 
 import domain.Address;
 import domain.Contact;
+import domain.entities.address.City;
+import domain.entities.address.PostCode;
+import domain.entities.address.State;
+import domain.entities.contact.Detail;
+import domain.entities.contact.Type;
 import es.reporitory.EventStore;
 import es.service.CatService;
 import org.junit.Before;
@@ -21,8 +26,8 @@ public class ApplicationUnitTest {
 
     @Before
     public void SetUp() {
-        this.repository = new EventStore();
-        this.catService = new CatService(this.repository);
+        this.repository = EventStore.empty();
+        this.catService = CatService.create(this.repository);
     }
 
     @Test
@@ -31,16 +36,30 @@ public class ApplicationUnitTest {
 
         this.catService.createCat(catId, "Kitek");
         this.catService.updateCat(catId,
-                Stream.of(new Contact("Email", "john.smith@o2.com"),
-                        new Contact("Email", "joh.smith@ijk.com")).collect(Collectors.toSet()),
-                Stream.of(new Address("New York", "NY", "10001"),
-                        new Address("Las Vegas", "CA", "90001")).collect(Collectors.toSet())
+                Stream.of(Contact.create(Type.type("Email"),
+                                Detail.detail("john.smith@o2.com")),
+                        Contact.create(Type.type("Email"),
+                                Detail.detail("joh.smith@ijk.com")))
+                        .collect(Collectors.toSet()),
+                Stream.of(Address.create(City.city("New York"),
+                                State.state("NY"),
+                                PostCode.postCode("10001")),
+                        Address.create(City.city("Las Vegas"),
+                                State.state("CA"),
+                                PostCode.postCode("90001"))).collect(Collectors.toSet())
                 );
         this.catService.updateCat(catId,
-                Stream.of(new Contact("Email", "john.smith@o2.com"),
-                        new Contact("Email", "joh.smith@ijk.com")).collect(Collectors.toSet()),
-                Stream.of(new Address("Krakow", "KR", "10100"),
-                        new Address("Krakow", "KR", "10100")).collect(Collectors.toSet())
+                Stream.of(Contact.create(Type.type("Email"),
+                                Detail.detail("john.smith@o2.com")),
+                        Contact.create(Type.type("Email"),
+                                Detail.detail("joh.smith@ijk.com")))
+                        .collect(Collectors.toSet()),
+                Stream.of(Address.create(City.city("Krakow"),
+                                State.state("KR"),
+                                PostCode.postCode("10100")),
+                        Address.create(City.city("Krakow"),
+                                State.state("KR"),
+                                PostCode.postCode("10100"))).collect(Collectors.toSet())
         );
 
         assertNotEquals(this.catService.getAddressByRegion(catId, "NY").size(), 2);

@@ -19,16 +19,24 @@ public class CatAggregate {
 
     private EventStore writeRepository;
 
-    public CatAggregate() {
-        this.writeRepository = new EventStore();
+    public static CatAggregate empty() {
+        return new CatAggregate();
     }
 
-    public CatAggregate(EventStore eventStore) {
+    public static CatAggregate create(EventStore eventStore) {
+        return new CatAggregate(eventStore);
+    }
+
+    private CatAggregate() {
+        this.writeRepository = EventStore.empty();
+    }
+
+    private CatAggregate(EventStore eventStore) {
         this.writeRepository = eventStore;
     }
 
     public List<Event> handleCreateCatCommand(CreateCatCommand createCatCommand) {
-        CatCreatedEvent catCreatedEvent = new CatCreatedEvent(createCatCommand.getCatId(), createCatCommand.getName());
+        CatCreatedEvent catCreatedEvent = CatCreatedEvent.create(createCatCommand.getCatId(), createCatCommand.getName());
 
         this.writeRepository.addEvent(catCreatedEvent.getCatId(), catCreatedEvent);
 
@@ -43,7 +51,7 @@ public class CatAggregate {
                 .filter(address -> !cat.getAddresses().contains(address))
                 .collect(Collectors.toList());
         for (Address address : addresses) {
-            CatAddressAddEvent catAddressAddEvent = new CatAddressAddEvent(address.getCity(), address.getState(), address.getPostcode());
+            CatAddressAddEvent catAddressAddEvent = CatAddressAddEvent.create(address.getCity(), address.getState(), address.getPostcode());
             events.add(catAddressAddEvent);
             writeRepository.addEvent(updateCatCommand.getCatId(), catAddressAddEvent);
         }

@@ -12,10 +12,14 @@ public class CatUpdateCatCommand extends Event {
     private Set<Address> addresses;
     private Set<Contact> contacts;
 
+    public static CatUpdateCatCommand create(String catId, Set<Address> addresses, Set<Contact> contacts) {
+        return new CatUpdateCatCommand(catId, addresses, contacts);
+    }
+
     private CatUpdateCatCommand() {
     }
 
-    public CatUpdateCatCommand(String catId, Set<Address> addresses, Set<Contact> contacts) {
+    private CatUpdateCatCommand(String catId, Set<Address> addresses, Set<Contact> contacts) {
         this.catId = catId;
         this.addresses = addresses;
         this.contacts = contacts;

@@ -7,10 +7,14 @@ public class CatCreatedEvent extends Event {
     private String catId;
     private String name;
 
+    public static CatCreatedEvent create(String catId, String name) {
+        return new CatCreatedEvent(catId, name);
+    }
+
     private CatCreatedEvent() {
     }
 
-    public CatCreatedEvent(String catId, String name) {
+    private CatCreatedEvent(String catId, String name) {
         this.catId = catId;
         this.name = name;
     }

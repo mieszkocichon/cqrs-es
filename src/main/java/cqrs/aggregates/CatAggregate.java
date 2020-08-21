@@ -9,16 +9,24 @@ public class CatAggregate {
 
     private CatWriteRepository catWriteRepository;
 
-    public CatAggregate() {
-        this.catWriteRepository = new CatWriteRepository();
+    public static CatAggregate empty() {
+        return new CatAggregate();
     }
 
-    public CatAggregate(CatWriteRepository catWriteRepository) {
+    private static CatAggregate create(CatWriteRepository catWriteRepository) {
+        return new CatAggregate(catWriteRepository);
+    }
+
+    private CatAggregate() {
+        this.catWriteRepository = CatWriteRepository.empty();
+    }
+
+    private CatAggregate(CatWriteRepository catWriteRepository) {
         this.catWriteRepository = catWriteRepository;
     }
 
     public Cat handleCreateCatCommand(CreateCatCommand createCatCommand) {
-        Cat cat = new Cat(createCatCommand.getCatId(), createCatCommand.getName());
+        Cat cat = Cat.create(createCatCommand.getCatId(), createCatCommand.getName());
 
         this.catWriteRepository.addCat(cat.getCatId(), cat);
 

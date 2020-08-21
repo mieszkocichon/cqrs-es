@@ -10,10 +10,14 @@ public class UpdateCatCommand {
     private Set<Address> addresses;
     private Set<Contact> contacts;
 
+    public static UpdateCatCommand create(String catId, Set<Address> addresses, Set<Contact> contacts) {
+        return new UpdateCatCommand(catId, addresses, contacts);
+    }
+
     private UpdateCatCommand() {
     }
 
-    public UpdateCatCommand(String catId, Set<Address> addresses, Set<Contact> contacts) {
+    private UpdateCatCommand(String catId, Set<Address> addresses, Set<Contact> contacts) {
         this.catId = catId;
         this.addresses = addresses;
         this.contacts = contacts;

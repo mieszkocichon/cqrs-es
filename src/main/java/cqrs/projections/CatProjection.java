@@ -10,18 +10,26 @@ import java.util.*;
 public class CatProjection {
     private CatReadRepository catReadRepository;
 
-    public CatProjection() {
-        this.catReadRepository = new CatReadRepository();
+    public static CatProjection empty() {
+        return new CatProjection();
     }
 
-    public CatProjection(CatReadRepository catReadRepository) {
+    public static CatProjection create(CatReadRepository catReadRepository) {
+        return new CatProjection(catReadRepository);
+    }
+
+    private CatProjection() {
+        this.catReadRepository = CatReadRepository.empty();
+    }
+
+    private CatProjection(CatReadRepository catReadRepository) {
         this.catReadRepository = catReadRepository;
     }
 
     public void project(Cat cat) {
         CatOwnerContact catOwnerContact = Optional.ofNullable(
                 this.catReadRepository.getCatContact(cat.getCatId())
-        ).orElse(new CatOwnerContact());
+        ).orElse(CatOwnerContact.create());
         Map<String, Set<Contact>> contactByType = new HashMap<>();
         for (Contact contact : cat.getContacts()) {
             Set<Contact> contacts = Optional.ofNullable(contactByType.get(contact.getType()))
@@ -33,7 +41,7 @@ public class CatProjection {
         this.catReadRepository.addCatOwnerContact(cat.getCatId(), catOwnerContact);
 
         CatAddress catAddress = Optional.ofNullable(catReadRepository.getCatAddress(cat.getCatId()))
-                .orElse(new CatAddress());
+                .orElse(CatAddress.create());
         Map<String, Set<Address>> addressByRegion = new HashMap<>();
         for (Address address : cat.getAddresses()) {
             Set<Address> addresses = Optional.ofNullable(addressByRegion.get(address.getState()))

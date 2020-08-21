@@ -5,10 +5,14 @@ public class CreateCatCommand {
     private String catId;
     private String name;
 
+    public static CreateCatCommand create(String catId, String name) {
+        return new CreateCatCommand(catId, name);
+    }
+
     private CreateCatCommand() {
     }
 
-    public CreateCatCommand(String catId, String name) {
+    private CreateCatCommand(String catId, String name) {
         this.catId = catId;
         this.name = name;
     }

@@ -11,7 +11,11 @@ public class CatReadRepository {
     private Map<String, CatOwnerContact> catContact;
     private Map<String, CatAddress> catAddress;
 
-    public CatReadRepository() {
+    public static CatReadRepository empty() {
+        return new CatReadRepository();
+    }
+
+    private CatReadRepository() {
         this.catContact = new HashMap<>();
         this.catAddress = new HashMap<>();
     }

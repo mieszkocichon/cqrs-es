@@ -8,8 +8,15 @@ public class CatOwnerContact {
 
     private Map<String, Set<Contact>> contactByType;
 
-    public CatOwnerContact() {
-        this.contactByType = new HashMap<>();
+    private CatOwnerContact() {
+    }
+
+    public static CatOwnerContact create() {
+        return new CatOwnerContact(new HashMap<>());
+    }
+
+    private CatOwnerContact(Map<String, Set<Contact>> contactByType) {
+        this.contactByType = contactByType;
     }
 
     public Map<String, Set<Contact>> getContactByType() {

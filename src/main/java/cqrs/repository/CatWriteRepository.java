@@ -9,8 +9,12 @@ public class CatWriteRepository {
 
     private Map<String, Cat> store;
 
-    public CatWriteRepository() {
-        this.store = new HashMap<String, Cat>();
+    public static CatWriteRepository empty() {
+        return new CatWriteRepository();
+    }
+
+    private CatWriteRepository() {
+        this.store = new HashMap<>();
     }
 
     public void addCat(String catId, Cat cat) {
