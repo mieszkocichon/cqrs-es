@@ -1,12 +1,14 @@
 package cqrs.projections;
 
-import domain.*;
 import cqrs.queries.AddressByRegionQuery;
 import cqrs.queries.ContactByTypeQuery;
 import cqrs.repository.CatReadRepository;
+import domain.*;
 import domain.entities.contact.ContactType;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CatProjection {
     private CatReadRepository catReadRepository;
@@ -31,7 +33,7 @@ public class CatProjection {
         CatOwnerContact catOwnerContact = Optional.ofNullable(
                 this.catReadRepository.getCatContact(cat.getCatId())
         ).orElse(CatOwnerContact.create());
-        EnumMap<ContactType, Set<Contact>> contactByType = new EnumMap<ContactType, Set<Contact>>(ContactType.class);
+        EnumMap<ContactType, Set<Contact>> contactByType = new EnumMap<>(ContactType.class);
         for (Contact contact : cat.getContacts()) {
             Set<Contact> contacts = Optional.ofNullable(contactByType.get(contact.getType()))
                     .orElse(new HashSet<>());
@@ -55,22 +57,22 @@ public class CatProjection {
     }
 
     public Set<Contact> handle(ContactByTypeQuery contactByTypeQuery) throws Exception {
-        CatOwnerContact catOwnerContact = catReadRepository.getCatContact(contactByTypeQuery.getCatId());
-
-        if (catOwnerContact == null) {
-            throw new Exception("Cat owner not exists.");
-        }
-
-        return catOwnerContact.getContactByType().get(contactByTypeQuery.getContactType());
+        return Optional.of(catReadRepository.getCatContact(contactByTypeQuery.getCatId()))
+                .orElseThrow(() -> new Exception("Cat owner not exists."))
+                .getContactByType()
+                .get(contactByTypeQuery.getContactType());
     }
 
     public Set<Address> handle(AddressByRegionQuery addressByRegionQuery) throws Exception {
-        CatAddress catAddress = catReadRepository.getCatAddress(addressByRegionQuery.getCatId());
+        return Optional.of(catReadRepository.getCatAddress(addressByRegionQuery.getCatId()))
+                .orElseThrow(() -> new Exception("Cat not exists."))
+                .getAddressByType()
+                .get(addressByRegionQuery.getState());
+    }
 
-        if (catAddress == null) {
-            throw new Exception("Cat not exists.");
-        }
-
-        return catAddress.getAddressByType().get(addressByRegionQuery.getState());
+    public Set<Address> handleByTime(AddressByRegionQuery addressByRegionQuery, Instant occuredAt) throws Exception {
+        return this.handle(addressByRegionQuery).stream()
+                .filter(address -> !address.getOccuredAt().isAfter(occuredAt))
+                .collect(Collectors.toSet());
     }
 }

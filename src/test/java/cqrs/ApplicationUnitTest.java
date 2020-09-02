@@ -1,9 +1,14 @@
 package cqrs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
+import cqrs.aggregates.CatAggregate;
+import cqrs.commands.CreateCatCommand;
+import cqrs.commands.UpdateCatCommand;
+import cqrs.projections.CatProjection;
 import cqrs.queries.AddressByRegionQuery;
+import cqrs.queries.ContactByTypeQuery;
+import domain.Address;
+import domain.Cat;
+import domain.Contact;
 import domain.entities.address.City;
 import domain.entities.address.PostCode;
 import domain.entities.address.State;
@@ -19,14 +24,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import cqrs.aggregates.CatAggregate;
-import cqrs.commands.CreateCatCommand;
-import cqrs.commands.UpdateCatCommand;
-import domain.Address;
-import domain.Cat;
-import domain.Contact;
-import cqrs.projections.CatProjection;
-import cqrs.queries.ContactByTypeQuery;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class ApplicationUnitTest {
 
@@ -66,10 +65,10 @@ public class ApplicationUnitTest {
         Iterator<Contact> contactIterator = catProjection.handle(contactByTypeQuery).iterator();
         Contact contact1 = contactIterator.next();
         assertEquals(contact1.getType(), ContactType.EMAIL);
-        assertEquals(contact1.getDetail(), "john.smith@o2.com");
+        assertEquals(contact1.getDetail(), "john.smith@jiu.com");
         Contact contact2 = contactIterator.next();
         assertEquals(contact2.getType(), ContactType.EMAIL);
-        assertEquals(contact2.getDetail(), "john.smith@jiu.com");
+        assertEquals(contact2.getDetail(), "john.smith@o2.com");
 
         AddressByRegionQuery addressByRegionQuery = AddressByRegionQuery.create(catId, "NY");
         Set<Address> addressesSet = catProjection.handle(addressByRegionQuery);

@@ -43,10 +43,11 @@ public class CatProjector {
     }
 
     public void apply(String catId, CatAddressAddEvent catAddressAddEvent) {
-        Address address = Address.create(
+        Address address = Address.createByTime(
                 City.city(catAddressAddEvent.getCity()),
                 State.state(catAddressAddEvent.getState()),
-                PostCode.postCode(catAddressAddEvent.getPostcode()));
+                PostCode.postCode(catAddressAddEvent.getPostcode()),
+                catAddressAddEvent.occurredAt);
 
         CatAddress catAddress = Optional.ofNullable(catReadRepository.getCatAddress(catId))
                 .orElse(CatAddress.create());

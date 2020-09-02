@@ -1,7 +1,10 @@
 package escqrs;
 
+import cqrs.commands.CreateCatCommand;
 import cqrs.commands.UpdateCatCommand;
+import cqrs.projections.CatProjection;
 import cqrs.queries.AddressByRegionQuery;
+import cqrs.repository.CatReadRepository;
 import domain.Address;
 import domain.Contact;
 import domain.entities.address.City;
@@ -10,19 +13,19 @@ import domain.entities.address.State;
 import domain.entities.contact.ContactType;
 import domain.entities.contact.Detail;
 import domain.entities.contact.Type;
-import escqrs.aggregates.CatAggregate;
-import cqrs.commands.CreateCatCommand;
-import cqrs.projections.CatProjection;
-import escqrs.projectors.CatProjector;
-import cqrs.repository.CatReadRepository;
 import es.reporitory.Event;
 import es.reporitory.EventStore;
+import escqrs.aggregates.CatAggregate;
+import escqrs.projectors.CatProjector;
+import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,7 +53,7 @@ public class ApplicationUnitTest {
 
     @Test
     public void givenCQRSApplication_whenCommandRun_thenQueryShouldReturnResult() throws Exception {
-        List<Event> events = null;
+        List<Event> events;
         CreateCatCommand createCatCommand = CreateCatCommand.create(catId, "Kitek");
         events = this.catAggregate.handleCreateCatCommand(createCatCommand);
 
@@ -133,7 +136,7 @@ public class ApplicationUnitTest {
                         Address.create(
                                 City.city("Hawai"),
                                 State.state("HA"),
-                                PostCode.postCode("2000"))
+                                PostCode.postCode("1000"))
                 ).collect(Collectors.toSet()),
 
                 Stream.of(
@@ -157,12 +160,7 @@ public class ApplicationUnitTest {
                         Address.create(
                                 City.city("Massachusetts"),
                                 State.state("MA"),
-                                PostCode.postCode("3000")
-                        ),
-                        Address.create(
-                                City.city("New Mexico"),
-                                State.state("NM"),
-                                PostCode.postCode("4000")
+                                PostCode.postCode("2000")
                         )
                 ).collect(Collectors.toSet()),
 
@@ -180,14 +178,9 @@ public class ApplicationUnitTest {
 
                 Stream.of(
                         Address.create(
-                                City.city("South Dakota"),
-                                State.state("SD"),
-                                PostCode.postCode("5000")
-                        ),
-                        Address.create(
-                                City.city("Alaska"),
-                                State.state("AL"),
-                                PostCode.postCode("6000")
+                                City.city("Massachusetts"),
+                                State.state("MA"),
+                                PostCode.postCode("3000")
                         )
                 ).collect(Collectors.toSet()),
 
@@ -201,6 +194,64 @@ public class ApplicationUnitTest {
         events = catAggregate.handleUpdateCatCommand(updateCatCommand);
         catProjector.project(catId, events);
 
+        final long lastTime = System.currentTimeMillis();
 
+        Awaitility.await().atMost(10, TimeUnit.SECONDS);
+
+        updateCatCommand = UpdateCatCommand.create(
+                catId,
+
+                Stream.of(
+                        Address.create(
+                                City.city("Massachusetts"),
+                                State.state("MA"),
+                                PostCode.postCode("4000")
+                        )
+                ).collect(Collectors.toSet()),
+
+                Stream.of(
+                        Contact.create(
+                                Type.type(ContactType.EMAIL),
+                                Detail.detail("5@5.en")
+                        )
+                ).collect(Collectors.toSet())
+        );
+        events = catAggregate.handleUpdateCatCommand(updateCatCommand);
+        catProjector.project(catId, events);
+
+        updateCatCommand = UpdateCatCommand.create(
+                catId,
+
+                Stream.of(
+                        Address.create(
+                                City.city("Kassachusetts"),
+                                State.state("KA"),
+                                PostCode.postCode("5000")
+                        )
+                ).collect(Collectors.toSet()),
+
+                Stream.of(
+                        Contact.create(
+                                Type.type(ContactType.EMAIL),
+                                Detail.detail("6@6.en")
+                        )
+                ).collect(Collectors.toSet())
+        );
+
+//        events = catAggregate.handleUpdateCatCommandByTime(updateCatCommand, Instant.now().minusMillis(System.currentTimeMillis() - lastTime));
+        events = catAggregate.handleUpdateCatCommand(updateCatCommand);
+        catProjector.project(catId, events);
+
+        AddressByRegionQuery addressByRegionQuery = AddressByRegionQuery.create(catId, "MA");
+
+        Awaitility.await().atMost(10, TimeUnit.SECONDS)
+                .until(() -> {
+                    Iterator<Address> addressIterator = catProjection
+                            .handleByTime(addressByRegionQuery, Instant.now().minusMillis(System.currentTimeMillis() - lastTime))
+                            .iterator();
+                    Address address = addressIterator.next();
+
+                    return address.getPostcode().equals("3000");
+                });
     }
 }

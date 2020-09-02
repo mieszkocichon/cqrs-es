@@ -4,20 +4,29 @@ import domain.entities.address.City;
 import domain.entities.address.PostCode;
 import domain.entities.address.State;
 
+import java.time.Instant;
+
 public class Address {
 
     private String city;
     private String state;
     private String postcode;
+    private Instant occuredAt;
 
     public static Address create(City city, State state, PostCode postcode) {
-        return new Address(city, state, postcode);
+        return new Address(city, state, postcode, Instant.now());
     }
 
-    private Address(City city, State state, PostCode postcode) {
+    public static Address createByTime(City city, State state, PostCode postcode, Instant occuredAd)
+    {
+        return new Address(city, state, postcode, occuredAd);
+    }
+
+    private Address(City city, State state, PostCode postcode, Instant occuredAt) {
         this.city = city.getValue();
         this.state = state.getValue();
-        this.postcode = postcode.getValue();
+        this.postcode = PostCode.getValue();
+        this.occuredAt = occuredAt;
     }
 
     public String getCity() {
@@ -42,5 +51,13 @@ public class Address {
 
     public void setPostcode(String postcode) {
         this.postcode = postcode;
+    }
+
+    public Instant getOccuredAt() {
+        return occuredAt;
+    }
+
+    public void setOccuredAt(Instant occuredAt) {
+        this.occuredAt = occuredAt;
     }
 }

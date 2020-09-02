@@ -67,4 +67,9 @@ public class ApplicationUnitTest {
         assertEquals(this.catService.getAddressByRegion(catId, "NY").size(), 1);
         assertEquals(this.catService.getAddressByRegion(catId, "KR").size(), 2);
     }
+
+    @Test(expected = Throwable.class)
+    public void givenCRUDApplication_whenCatIsNull_thenThrowException() throws Exception {
+        CatService.create(EventStore.empty()).getAddressByRegion(null, null);
+    }
 }

@@ -45,6 +45,10 @@ public class CatAggregate {
 
     public List<Event> handleUpdateCatCommand(UpdateCatCommand updateCatCommand) {
         Cat cat = CatUtility.recreateCatState(writeRepository, updateCatCommand.getCatId());
+        return updateCatCommand(updateCatCommand, cat);
+    }
+
+    private List<Event> updateCatCommand(UpdateCatCommand updateCatCommand, Cat cat) {
         List<Event> events = new LinkedList<>();
 
         List<Address> addresses = updateCatCommand.getAddresses().stream()

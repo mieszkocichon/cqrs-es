@@ -7,6 +7,7 @@ import es.events.CatAddressRemoveEvent;
 import es.events.CatCreatedEvent;
 import es.reporitory.EventStore;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,25 +33,23 @@ public class CatService {
     public void updateCat(String catId, Set<Contact> contacts, Set<Address> addresses) throws Exception {
         Cat cat = CatUtility.recreateCatState(this.repository, catId);
 
-        if (cat == null) {
-            throw new Exception("Cat does not exist.");
-        }
-
-        cat.getAddresses()
+        Optional.ofNullable(cat)
+                .orElseThrow(() -> new Exception("Cat does not exist."))
+                .getAddresses()
                 .stream()
                 .filter(addresses::contains)
                 .forEach(a -> this.repository.addEvent(catId, CatAddressRemoveEvent.create(a.getCity(), a.getState(), a.getPostcode())));
 
         addresses.stream()
-                .filter(a -> !cat.getAddresses().contains(a))
+                .filter(address -> !cat.getAddresses().contains(address))
                 .forEach(a -> repository.addEvent(catId, CatAddressAddEvent.create(a.getCity(), a.getState(), a.getPostcode())));
     }
 
     public Set<Address> getAddressByRegion(String catId, String state) throws Exception {
         Cat cat = CatUtility.recreateCatState(this.repository, catId);
-        if (cat == null) {
-            throw new Exception("Cat doesn't exist.");
-        }
+
+        Optional.ofNullable(cat).orElseThrow(() -> new Exception("Cat doesn't exist."));
+
         return cat.getAddresses().stream().filter(address -> address.getState().equals(state)).collect(Collectors.toSet());
     }
 }
